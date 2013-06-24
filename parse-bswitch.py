@@ -1,7 +1,7 @@
 import codecs
 import numpy
 filelist = open('./bswitch-filelist')
-summary = [['Filename','Subject', '%ACC-total', 'Mean RT-ACC_total', 'Mean RT-INACC_total', '%ACC-all_nonswitch', 'Mean RT-ACC-all_nonswitch', 'Mean RT-INACC_all_nonswitch', '%ACC-all_switch', 'Mean RT-ACC_all_switch', 'Mean RT-INACC_all_switch', '%ACC-nonswitch0', 'Mean RT-ACC-nonswitch0', 'Mean RT-INACC_nonswitch0', '%ACC-nonswitch1', 'Mean RT-ACC-nonswitch1', 'Mean RT-INACC_nonswitch1', '%ACC-nonswitch2', 'Mean RT-ACC-nonswitch2', 'Mean RT-INACC_nonswitch2', '%ACC-nonswitch3', 'Mean RT-ACC-nonswitch3', 'Mean RT-INACC_nonswitch3', '%ACC-switch0', 'Mean RT-ACC_switch0', 'Mean RT-INACC_switch0', '%ACC-switch1', 'Mean RT-ACC_switch1', 'Mean RT-INACC_switch1', '%ACC-switch2', 'Mean RT-ACC_switch2', 'Mean RT-INACC_switch2', '%ACC-switch3', 'Mean RT-ACC_switch3', 'Mean RT-INACC_switch3', '%ACC-switch4', 'Mean RT-ACC_switch4', 'Mean RT-INACC_switch4']]
+summary = [['Filename','Subject', '%ACC-total', 'Mean RT-ACC_total', 'Mean RT-INACC_total', '%ACC-all_nonswitch', 'Mean RT-ACC-all_nonswitch', 'Mean RT-INACC_all_nonswitch', '%ACC-all_switch', 'Mean RT-ACC_all_switch', 'Mean RT-INACC_all_switch', '%ACC-nonswitch1', 'Mean RT-ACC-nonswitch1', 'Mean RT-INACC_nonswitch1', '%ACC-nonswitch2', 'Mean RT-ACC-nonswitch2', 'Mean RT-INACC_nonswitch2', '%ACC-nonswitch3', 'Mean RT-ACC-nonswitch3', 'Mean RT-INACC_nonswitch3', '%ACC-nonswitch4', 'Mean RT-ACC-nonswitch4', 'Mean RT-INACC_nonswitch4', '%ACC-switch1', 'Mean RT-ACC_switch1', 'Mean RT-INACC_switch1', '%ACC-switch2', 'Mean RT-ACC_switch2', 'Mean RT-INACC_switch2', '%ACC-switch3', 'Mean RT-ACC_switch3', 'Mean RT-INACC_switch3', '%ACC-switch4', 'Mean RT-ACC_switch4', 'Mean RT-INACC_switch4']]
 
 def id_outliers(list_of_RTs, check_depth, max_step): #Takes a list of response times, an int indicating how many RTs on either end of the sorted list should be evaluated, and an int indicating how large of a jump between two sequential RTs in these end regions designates the start of the outliers.  
 	if check_depth < 2:
@@ -37,7 +37,7 @@ for filename in filelist:
 	datarows = []
 	rts_acc = []
 	rts_inacc = []
-	datarowsbycase = {'all_switch':[], 'switch0':[], 'switch1':[], 'switch2':[], 'switch3':[], 'switch4':[] , 'all_nonswitch':[], 'nonswitch0':[], 'nonswitch1':[], 'nonswitch2':[], 'nonswitch3':[], 'all':[]}
+	datarowsbycase = {'all_switch':[], 'switch1':[], 'switch2':[], 'switch3':[], 'switch4':[] , 'all_nonswitch':[], 'nonswitch1':[], 'nonswitch2':[], 'nonswitch3':[], 'all':[]}
         for row in datafile:
                 if row.count(',') < 80:
                         continue
@@ -59,7 +59,7 @@ for filename in filelist:
 	print replacerts_inacc
 
 	#print datarows
-	priorstim = [datarows[0].strip().split(',')[1], 0, 0] #Switch status marker: [0]: case of last stim; [1]: switch depth; [2]: non-switch depth
+	priorstim = [datarows[0].strip().split(',')[1], 1] #Switch status marker: [0]: case of last stim; [1]: historical depth of prior case
 	#print priorstim
 	for i in range(0, len(datarows)):
 		activerow = datarows[i].strip().split(',')
@@ -73,18 +73,21 @@ for filename in filelist:
 					activerow[3] = unicode(str(rt[1]))
 			
 		datarowsbycase['all'].append(activerow)
+		if i == 0:
+			print str(priorstim[0]) + ": This is the first trial."
+			continue
 		if activerow[1] == priorstim[0]:
 			datarowsbycase['all_nonswitch'].append(activerow)
-			datarowsbycase['nonswitch'+str(priorstim[2])].append(activerow)
-			priorstim[1] = 0
-			priorstim[2] += 1
+			datarowsbycase['nonswitch'+str(priorstim[1])].append(activerow)
+			print str(activerow[1]) + ": This is a nonswitch-" + str(priorstim[1]) + " trial"
+			priorstim[1] += 1
 			
 		else:
 			datarowsbycase['all_switch'].append(activerow)
 			datarowsbycase['switch'+str(priorstim[1])].append(activerow)
+			print str(activerow[1]) + ": This is a switch-" + str(priorstim[1]) + " trial"
 			priorstim[0] = activerow[1]
-			priorstim[1] += 1
-			priorstim[2] = 0
+			priorstim[1] = 1
 			
 	#print datarowsbycase
 	filereport = [filename[filename.rfind('/')+1:].strip(), datarows[0].strip().split(',')[0]]
