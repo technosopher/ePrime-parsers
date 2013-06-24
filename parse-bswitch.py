@@ -5,7 +5,9 @@ summary = [['Filename','Subject', '%ACC-total', 'Mean RT-ACC_total', 'Mean RT-IN
 
 def id_outliers(list_of_RTs, check_depth, max_step): #Takes a list of response times, an int indicating how many RTs on either end of the sorted list should be evaluated, and an int indicating how large of a jump between two sequential RTs in these end regions designates the start of the outliers.  
 	if check_depth < 2:
-		return []
+		check_depth = 2
+		if check_depth > len(list_of_RTs)/2:
+			return []
 	list_of_RTs.sort()
 	replace_RTs = []
 	trigger = 0
@@ -50,8 +52,8 @@ for filename in filelist:
 	print len(datarows)
 	print len(rts_acc)
 	print len(rts_inacc)
-	replacerts_acc = id_outliers(rts_acc, len(rts_acc)/10, 200) 
-	replacerts_inacc = id_outliers(rts_inacc, len(rts_inacc)/5, 200) 
+	replacerts_acc = id_outliers(rts_acc, len(rts_acc)/20, 200) 
+	replacerts_inacc = id_outliers(rts_inacc, len(rts_inacc)/20, 200) 
 	print "Replacing"
 	print replacerts_acc
 	print replacerts_inacc
@@ -91,7 +93,7 @@ for filename in filelist:
 		wrongrts = [int(datapoint[3]) for datapoint in dataarray if datapoint[2] == '0']
 		#print correctrts
 		numtrials = len(dataarray)
-		#print "Total number of " + case + " responses: " + str(numtrials)
+		print "Total number of " + case + " responses: " + str(numtrials)
 		print "Number of correct " + case + " responses: " + str(len(correctrts))
 		#print "Number of incorrect " + case + " responses: " + str(len(wrongrts))
 		if numtrials == 0:
